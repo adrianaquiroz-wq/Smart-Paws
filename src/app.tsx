@@ -1,7 +1,7 @@
 
 /********************************parte miguel********************************/
 import { useState, useEffect, useCallback, useMemo, FormEvent } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Activity, Zap, ChevronRight, RefreshCw, Clock, Heart, Menu, X,
   User, ShieldCheck, ShoppingBag, ClipboardList, PlusCircle,
