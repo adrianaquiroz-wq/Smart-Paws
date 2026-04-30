@@ -1,3 +1,152 @@
+/****************************************************PARTE POR MIGUEL******************************************/
+import { useState, useEffect, useCallback, useMemo, FormEvent } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { 
+  Stethoscope, 
+  Activity, 
+  Zap, 
+  Phone, 
+  ChevronRight,
+  RefreshCw,
+  Clock,
+  Heart,
+  Menu,
+  X,
+  User,
+  ShieldCheck,
+  ShoppingBag,
+  ClipboardList,
+  PlusCircle,
+  CheckCircle2,
+  AlertCircle,
+  BarChart3,
+  Search,
+  Filter,
+  Calendar,
+  Lock,
+  LogOut,
+  MapPin,
+  Pill,
+  Syringe,
+  FileText
+} from 'lucide-react';
+
+// --- Types ---
+interface DogApiResponse {
+  message: string;
+  status: string;
+}
+
+interface PetStatus {
+  condition: 'Saludable' | 'En Tratamiento' | 'Recuperación' | 'Crítico';
+  lastCheckup: string;
+}
+
+interface Pet {
+  id: string;
+  name: string;
+  species: string;
+  breed: string;
+  age: string;
+  status: PetStatus;
+  ownerId: string;
+}
+
+interface MedicalRecord {
+  id: string;
+  petId: string;
+  date: string;
+  diagnosis: string;
+  treatment: string;
+  vet: string;
+  type: 'Consulta' | 'Cirugía' | 'Vacunación' | 'Laboratorio';
+}
+
+interface Product {
+  id: number;
+  name: string;
+  price: string;
+  category: string;
+  image: string;
+}
+
+// --- Mock Data ---
+const PRODUCTS: Product[] = [
+  { id: 1, name: "Plan Nutricional Pro-Active", price: "$45.00", category: "Nutrición", image: "https://images.unsplash.com/photo-1589924691106-073b19f5538d?auto=format&fit=crop&w=600&q=80" },
+  { id: 2, name: "Smart Health Tracker v2", price: "$120.00", category: "Tecnología", image: "https://images.unsplash.com/photo-1615367677402-2a7442ebccf7?auto=format&fit=crop&w=600&q=80" },
+  { id: 3, name: "Medical Kit Emergencias", price: "$89.99", category: "Salud", image: "https://images.unsplash.com/photo-1628160539584-9345236b2b5f?auto=format&fit=crop&w=600&q=80" }
+];
+
+const INITIAL_PETS: Pet[] = [
+  { id: '1', name: 'Max', species: 'Canino', breed: 'Golden Retriever', age: '3 años', ownerId: 'client1', status: { condition: 'Saludable', lastCheckup: '2024-04-15' } },
+  { id: '2', name: 'Luna', species: 'Felino', breed: 'Siames', age: '2 años', ownerId: 'client1', status: { condition: 'Recuperación', lastCheckup: '2024-04-28' } },
+  { id: '3', name: 'Rocky', species: 'Canino', breed: 'Bulldog', age: '5 años', ownerId: 'client2', status: { condition: 'En Tratamiento', lastCheckup: '2024-04-30' } }
+];
+
+const INITIAL_HISTORY: MedicalRecord[] = [
+  { id: 'h1', petId: '1', date: '2024-04-15', diagnosis: 'Chequeo anual preventivo', treatment: 'Refuerzo de vitaminas', vet: 'Dr. Sanchez', type: 'Consulta' },
+  { id: 'h2', petId: '2', date: '2024-04-28', diagnosis: 'Fractura leve en pata trasera', treatment: 'Vendaje y analgésicos', vet: 'Dra. Quiroz', type: 'Cirugía' },
+  { id: 'h3', petId: '1', date: '2023-12-10', diagnosis: 'Vacuna contra Rabia', treatment: 'Administración de dosis', vet: 'Dr. Arellano', type: 'Vacunación' }
+];
+
+// --- Sub-Components ---
+
+const SectionHeader = ({ title, subtitle, badge }: { title: string, subtitle: string, badge?: string }) => (
+  <div className="mb-12">
+    {badge && <span className="text-blue-600 font-bold uppercase tracking-widest text-[10px] mb-2 block">{badge}</span>}
+    <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">{title}</h2>
+    <p className="text-slate-500 max-w-2xl text-lg leading-relaxed">{subtitle}</p>
+  </div>
+);
+
+export default function App() {
+  const [activePortal, setActivePortal] = useState<'public' | 'client' | 'admin'>('public');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [authType, setAuthType] = useState<'client' | 'admin' | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [isAddPetOpen, setIsAddPetOpen] = useState(false);
+  
+  // Data State
+  const [pets, setPets] = useState<Pet[]>(INITIAL_PETS);
+  const [history, setHistory] = useState<MedicalRecord[]>(INITIAL_HISTORY);
+  const [dateFilter, setDateFilter] = useState({ start: '', end: '' });
+  const [loginForm, setLoginForm] = useState({ user: '', pass: '' });
+
+  // Dog API State
+  const [dogImage, setDogImage] = useState<string | null>(null);
+  const [loadingDog, setLoadingDog] = useState(true);
+
+  const fetchDog = useCallback(async () => {
+    try {
+      setLoadingDog(true);
+      const res = await fetch('https://dog.ceo/api/breeds/image/random');
+      const data: DogApiResponse = await res.json();
+      if (data.status === 'success') setDogImage(data.message);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingDog(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDog();
+  }, [fetchDog]);
+
+  const scrollToSection = (id: string) => {
+    setActivePortal('public');
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+    setIsMobileMenuOpen(false);
+  };
+
+  const handleLogin = (type: 'client' | 'admin') => {
+
+/****************************************************PARTE POR MIGUEL******************************************/
+
 /****************************************************PARTE POR AARON******************************************/
               {/* Patient Showcase (TheDogAPI) */}
               <section id="pacientes" className="py-32 px-6 md:px-12 bg-white">
