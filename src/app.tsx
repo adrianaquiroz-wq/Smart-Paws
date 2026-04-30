@@ -31,7 +31,6 @@ import {
   FileText
 } from 'lucide-react';
 
-// --- Types ---
 interface DogApiResponse {
   message: string;
   status: string;
@@ -70,7 +69,6 @@ interface Product {
   image: string;
 }
 
-// --- Mock Data ---
 const PRODUCTS: Product[] = [
   { id: 1, name: "Plan Nutricional Pro-Active", price: "$45.00", category: "Nutrición", image: "https://images.unsplash.com/photo-1589924691106-073b19f5538d?auto=format&fit=crop&w=600&q=80" },
   { id: 2, name: "Smart Health Tracker v2", price: "$120.00", category: "Tecnología", image: "https://images.unsplash.com/photo-1615367677402-2a7442ebccf7?auto=format&fit=crop&w=600&q=80" },
@@ -89,7 +87,6 @@ const INITIAL_HISTORY: MedicalRecord[] = [
   { id: 'h3', petId: '1', date: '2023-12-10', diagnosis: 'Vacuna contra Rabia', treatment: 'Administración de dosis', vet: 'Dr. Arellano', type: 'Vacunación' }
 ];
 
-// --- Sub-Components ---
 
 const SectionHeader = ({ title, subtitle, badge }: { title: string, subtitle: string, badge?: string }) => (
   <div className="mb-12">
@@ -107,13 +104,11 @@ export default function App() {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [isAddPetOpen, setIsAddPetOpen] = useState(false);
   
-  // Data State
   const [pets, setPets] = useState<Pet[]>(INITIAL_PETS);
   const [history, setHistory] = useState<MedicalRecord[]>(INITIAL_HISTORY);
   const [dateFilter, setDateFilter] = useState({ start: '', end: '' });
   const [loginForm, setLoginForm] = useState({ user: '', pass: '' });
 
-  // Dog API State
   const [dogImage, setDogImage] = useState<string | null>(null);
   const [loadingDog, setLoadingDog] = useState(true);
 
@@ -234,7 +229,6 @@ export default function App() {
                       </div>
                     </div>
 
-                    {/* Right: History & Filters */}
                     <div className="lg:col-span-2 space-y-8">
                       <div className="bg-white p-8 rounded-[3rem] border border-slate-200 shadow-xl">
                         <div className="flex flex-col sm:flex-row justify-between items-center mb-10 gap-6">
@@ -281,3 +275,56 @@ export default function App() {
             </motion.div>
           )}
 /************************************************************FIN DE PARTE DE AARON************************************************/
+
+
+
+
+
+
+/************************************************************PARTE DE adry************************************************/
+
+      <AnimatePresence>
+        {isAddPetOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsAddPetOpen(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" />
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="relative bg-white w-full max-w-md rounded-[3rem] p-10">
+              <h2 className="text-2xl font-black mb-8 italic">Nuevo Registro de Paciente</h2>
+              <form onSubmit={addPet} className="space-y-4">
+                <input name="name" required placeholder="Nombre Mascota" className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 focus:border-blue-500 outline-none font-bold" />
+                <input name="species" required placeholder="Especie (Canino, Felino...)" className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 focus:border-blue-500 outline-none font-bold" />
+                <input name="breed" required placeholder="Raza" className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 focus:border-blue-500 outline-none font-bold" />
+                <input name="age" required placeholder="Edad" className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 focus:border-blue-500 outline-none font-bold" />
+                <button type="submit" className="w-full bg-emerald-600 text-white font-black py-5 rounded-2xl shadow-xl shadow-emerald-100 uppercase tracking-widest text-xs hover:bg-emerald-700 transition-all mt-4">Finalizar Registro</button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} className="fixed inset-0 z-[100] bg-white p-8 flex flex-col gap-8 md:hidden">
+            <div className="flex justify-between items-center">
+              <span className="font-black italic text-xl uppercase tracking-tighter">Menu <span className="text-blue-600">SmartPaws</span></span>
+              <button onClick={() => setIsMobileMenuOpen(false)} className="p-2"><X /></button>
+            </div>
+            <div className="flex flex-col gap-6 text-2xl font-black tracking-tighter text-slate-900 border-t pt-8 overflow-y-auto">
+              {['Inicio', 'Servicios', 'Tienda', 'Pacientes'].map(s => (
+                <button key={s} onClick={() => scrollToSection(s.toLowerCase())} className="text-left hover:text-blue-600 transition-colors">{s}</button>
+              ))}
+              <div className="h-px bg-slate-100 my-4" />
+              <button onClick={() => { setActivePortal('client'); setIsMobileMenuOpen(false); }} className="text-left text-blue-600">Portal Cliente</button>
+              <button onClick={() => { setActivePortal('admin'); setIsMobileMenuOpen(false); }} className="text-left">Profesional L-1</button>
+            </div>
+            <div className="mt-auto">
+              <button onClick={() => { setIsBookingOpen(true); setIsMobileMenuOpen(false); }} className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase text-xs tracking-widest">
+                Agendar Cita PRO
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+    </div>
+  );
+}
