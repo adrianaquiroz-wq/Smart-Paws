@@ -1,1 +1,6 @@
-
+{
+  "name": "Smart Paws Pro",
+  "description": "Veterinaria inteligente con tecnología avanzada y cuidado amoroso para tus mascotas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
