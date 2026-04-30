@@ -276,10 +276,154 @@ export default function App() {
           )}
 /************************************************************FIN DE PARTE DE AARON************************************************/
 
+/************************************************************PARTE DE Max************************************************/
 
+         {/* ADMIN / VET PORTAL VIEW */}
+          {activePortal === 'admin' && (
+            <motion.div key="admin" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-h-screen bg-slate-900 py-12 px-6">
+              <div className="max-w-7xl mx-auto">
+                <div className="flex justify-between items-end mb-12">
+                  <div className="text-white">
+                    <h1 className="text-4xl font-black tracking-tighter mb-2 italic">Professional Medical Console</h1>
+                    <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Acceso Médico Autorizado • Dr. Miguel Sanchez</p>
+                  </div>
+                  <button onClick={() => setActivePortal('public')} className="bg-slate-800 p-3 rounded-2xl text-slate-400 hover:text-white transition-colors"><X className="w-6 h-6" /></button>
+                </div>
 
+                {!isLoggedIn ? (
+                  <div className="max-w-md mx-auto bg-slate-800 p-10 rounded-[3rem] border border-slate-700 shadow-2xl mt-20">
+                    <div className="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-8"><ShieldCheck className="w-8 h-8" /></div>
+                    <h2 className="text-white text-2xl font-black text-center mb-8">Login Veterinario</h2>
+                    <div className="space-y-5">
+                      <input type="text" placeholder="ID Empleado" className="w-full bg-slate-700 border-none rounded-2xl px-6 py-4 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all font-bold" value={loginForm.user} onChange={e => setLoginForm({...loginForm, user:e.target.value})} />
+                      <input type="password" placeholder="Key Pro" className="w-full bg-slate-700 border-none rounded-2xl px-6 py-4 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all font-bold" value={loginForm.pass} onChange={e => setLoginForm({...loginForm, pass:e.target.value})} />
+                      <button onClick={() => handleLogin('admin')} className="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-xl shadow-blue-500/20 uppercase tracking-widest text-xs hover:bg-blue-700 transition-all">Desbloquear Panel</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid lg:grid-cols-4 gap-8">
+                    {/* Stats */}
+                    {[{l:"Pacientes Hoy",v:"24",i:<Activity/>},{l:"Cirugías",v:"03",i:<Zap/>},{l:"Ingresos",v:"$2,450",i:<BarChart3/>},{l:"Emergencias",v:"01",i:<AlertCircle/>}].map((s,i)=>(
+                      <div key={i} className="bg-slate-800 p-8 rounded-[2rem] border border-slate-700 shadow-xl group hover:border-blue-600/50 transition-all">
+                        <div className="text-blue-500 mb-4">{s.i}</div>
+                        <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest mb-1">{s.l}</p>
+                        <p className="text-3xl font-black text-white italic">{s.v}</p>
+                      </div>
+                    ))}
 
+                    <div className="lg:col-span-4 bg-slate-800 p-10 rounded-[3.5rem] border border-slate-700">
+                      <div className="flex justify-between items-center mb-10">
+                        <h3 className="text-2xl font-black text-white italic">Base de Datos de Pacientes</h3>
+                        <div className="relative">
+                          <Search className="w-4 h-4 text-slate-500 absolute left-4 top-1/2 -translate-y-1/2" />
+                          <input type="text" placeholder="Filtrar por nombre o ID..." className="bg-slate-700 border-none rounded-full pl-12 pr-6 py-2.5 text-sm text-slate-300 outline-none focus:ring-2 focus:ring-blue-500 transition-all" />
+                        </div>
+                      </div>
 
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                          <thead>
+                            <tr className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] border-b border-slate-700">
+                              <th className="pb-6 pl-4">ID Paciente</th>
+                              <th className="pb-6">Nombre / Especie</th>
+                              <th className="pb-6">Dueño</th>
+                              <th className="pb-6">Estado Clínico</th>
+                              <th className="pb-6">Última Visita</th>
+                              <th className="pb-6 text-right pr-4">Acciones</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {pets.map(pet => (
+                              <tr key={pet.id} className="text-slate-300 border-b border-slate-700/50 hover:bg-slate-700/30 transition-all">
+                                <td className="py-6 pl-4 font-mono text-xs text-blue-400 font-bold">#SPP-{pet.id.toUpperCase()}</td>
+                                <td className="py-6">
+                                  <div className="flex flex-col">
+                                    <span className="text-white font-black">{pet.name}</span>
+                                    <span className="text-[10px] text-slate-500 uppercase">{pet.species} • {pet.breed}</span>
+                                  </div>
+                                </td>
+                                <td className="py-6 text-sm font-bold">{pet.ownerId}</td>
+                                <td className="py-6">
+                                  <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter ${
+                                    pet.status.condition === 'Saludable' ? 'bg-emerald-500/20 text-emerald-400' :
+                                    pet.status.condition === 'Recuperación' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400'
+                                  }`}>
+                                    {pet.status.condition}
+                                  </span>
+                                </td>
+                                <td className="py-6 text-sm font-bold text-slate-500">{pet.status.lastCheckup}</td>
+                                <td className="py-6 text-right pr-4">
+                                  <button className="px-4 py-2 bg-blue-600/10 text-blue-400 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-blue-600 hover:text-white transition-all">Ficha Completa</button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+
+        </AnimatePresence>
+      </main>
+
+      {/* Footer (Simplified) */}
+      <footer className="bg-slate-900 py-20 px-12 text-white border-t border-slate-800">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 text-center md:text-left">
+          <div className="flex flex-col gap-2">
+            <span className="text-xl font-black uppercase italic tracking-tighter">Smart Paws <span className="text-blue-500">Pro</span></span>
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Tecnologías Web I • Universidad Católica Boliviana</span>
+          </div>
+          <div className="flex gap-10 text-[10px] font-black uppercase tracking-widest text-slate-400">
+            <a href="#" className="hover:text-blue-500">Privacidad</a>
+            <a href="#" className="hover:text-blue-500">Soporte</a>
+            <a href="#" className="hover:text-blue-500">© 2024 VET-ALGORITHM</a>
+          </div>
+        </div>
+      </footer>
+
+      {/* Modals --- */}
+      
+      {/* Booking Modal */}
+      <AnimatePresence>
+        {isBookingOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsBookingOpen(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" />
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-white w-full max-w-xl rounded-[3rem] shadow-2xl p-12 overflow-hidden">
+              <div className="absolute top-0 right-0 p-8">
+                <button onClick={() => setIsBookingOpen(false)} className="text-slate-300 hover:text-slate-900 transition-colors"><X /></button>
+              </div>
+              <h2 className="text-4xl font-black tracking-tighter text-slate-900 mb-2 italic">Agendar Cita Pro</h2>
+              <p className="text-slate-500 mb-10 font-medium">Nuestro sistema de triaje asignará el mejor especialista disponible.</p>
+              <form className="space-y-6">
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 mb-2 tracking-widest">Información Mascota</label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <input type="text" placeholder="Nombre" className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 focus:border-blue-500 outline-none transition-all font-bold" />
+                    <select className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 focus:border-blue-500 outline-none transition-all font-bold">
+                      <option>Canino</option>
+                      <option>Felino</option>
+                      <option>Otro</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 mb-2 tracking-widest">Preferencia Temporal</label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <input type="date" className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 focus:border-blue-500 outline-none transition-all font-bold" />
+                    <input type="time" className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 focus:border-blue-500 outline-none transition-all font-bold" />
+                  </div>
+                </div>
+                <button type="button" onClick={() => setIsBookingOpen(false)} className="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-xl shadow-blue-100 uppercase tracking-widest text-xs hover:bg-blue-700 transition-all mt-4">Confirmar Registro Médico</button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+/************************************************************FIN DE PARTE DE Max************************************************/
 
 /************************************************************PARTE DE adry************************************************/
 
